@@ -62,8 +62,10 @@ const Groovarium = () => {
             const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
               (time) => {
+                if (players[instrument].loaded) { // Check if the player is loaded before starting
                 players[instrument].start(time);
                 setCurrentStep(index);
+                }
               },
               "2m", // Repeat after 2 measures
               Tone.Ticks(offsetTimeInTicks).toSeconds()
@@ -74,11 +76,15 @@ const Groovarium = () => {
     }
 
     // Cleanup function
-    return () => {
-      Tone.Transport.cancel(0);
-      Object.values(players).forEach((player) => player.dispose());
-    };
-  }, [allLoaded, debouncedPushPullSnare, drumPattern]); // Depend on debouncedPushPullSnare instead of pushPullSnare
+  return () => {
+    Tone.Transport.cancel(0);
+    Object.values(players).forEach((player) => {
+      if (player.state === "started") { // Check if the player has started before disposing
+        player.dispose();
+      }
+    });
+  };
+}, [allLoaded, debouncedPushPullSnare, drumPattern]); // Added drumPattern to the dependency array
 
   const togglePlayback = async () => {
     await Tone.start();
