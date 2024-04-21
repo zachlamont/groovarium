@@ -3,26 +3,27 @@ import PlayButton from "./PlayButton";
 import * as Tone from "tone";
 import BpmSlider from "./BpmSlider";
 import { drumPattern } from "../constants/groovarium";
+import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
+import PushPullKnob from "./PushPullKnob"; // Import the new component
+import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
+import { drumPattern as drumPatternConstant } from "../constants/groovarium";
+import useDebounce from "../utils/groovarium/useDebounce";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [allLoaded, setAllLoaded] = useState(false);
   const [bpm, setBpm] = useState(120); // Default BPM
+  const [pushPullSnare, setPushPullSnare] = useState(0); // New state for pushPullSnare
+  const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant }); // Create a copy of drumPattern
+  const debouncedPushPullSnare = useDebounce(pushPullSnare, 300); // Debounce pushPullSnare changes by 300ms
 
-  // Players setup with onload callback
-  const players = {
-    kick: new Tone.Player("/samples/bass.wav", checkLoaded).toDestination(),
-    snare: new Tone.Player("/samples/snare.wav", checkLoaded).toDestination(),
-    hat: new Tone.Player("/samples/hat.wav", checkLoaded).toDestination(),
-    clap: new Tone.Player("/samples/clap.wav", checkLoaded).toDestination(),
+  const setPushPull = (instrument, value) => {
+    if (instrument === "snare") {
+      setPushPullSnare(value);
+    }
+    // Add more conditions here for other instruments
   };
 
-  function checkLoaded() {
-    // Check if all players are loaded
-    if (Object.values(players).every((player) => player.loaded)) {
-      setAllLoaded(true); // Update state to true when all samples are loaded
-    }
-  }
+  const { players, allLoaded } = useSamplePlayers();
 
   // This useEffect will update the BPM in Tone.Transport whenever bpm state changes
   useEffect(() => {
@@ -34,13 +35,19 @@ const Groovarium = () => {
       Object.keys(drumPattern).forEach((instrument) => {
         drumPattern[instrument].forEach((play, index) => {
           if (play) {
-            const timeInTicks = index * 48; // Tone.js defaults to 192 ppq, which is equal to 96 ticks per sixteenth note
+            const timeInTicks = index * 48; // Tone.js defaults to 192 ppq, which is equal to 48 ticks per sixteenth note
+            const timingOffset = calculateTimingOffset(
+              debouncedPushPullSnare,
+              instrument,
+              index
+            );
+            const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
               (time) => {
                 players[instrument].start(time);
               },
-              "1m", // Repeat after 2 measures
-              Tone.Ticks(timeInTicks).toSeconds()
+              "2m", // Repeat after 2 measures
+              Tone.Ticks(offsetTimeInTicks).toSeconds()
             );
           }
         });
@@ -52,7 +59,7 @@ const Groovarium = () => {
       Tone.Transport.cancel(0);
       Object.values(players).forEach((player) => player.dispose());
     };
-  }, [allLoaded]); // Dependency on allLoaded
+  }, [allLoaded, debouncedPushPullSnare]); // Depend on debouncedPushPullSnare instead of pushPullSnare
 
   const togglePlayback = async () => {
     await Tone.start();
@@ -73,6 +80,12 @@ const Groovarium = () => {
         disabled={!allLoaded}
       />
       <BpmSlider selectedBPM={bpm} setSelectedBPM={setBpm} />
+      <PushPullKnob
+        instrument="snare"
+        setPushPull={setPushPull}
+        pushPullValue={pushPullSnare}
+      />
+      {/* Render the new component */}
     </div>
   );
 };
