@@ -11,7 +11,7 @@ const PushPullKnob = ({ instrument, setPushPull, pushPullValue }) => {
   };
 
   return (
-    <div>
+    <div className="bg-emerald-600">
       <label>{instrument} Push/Pull</label>
       <input
         type="range"
