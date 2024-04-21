@@ -22,6 +22,17 @@ const Groovarium = () => {
   const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
       setPushPullSnare({ offset: value, steps: steps });
+
+      // Create a new drumPattern object with updated timingOffsets for the snare
+      setDrumPattern((prevDrumPattern) => {
+        const newDrumPattern = { ...prevDrumPattern }; // Create a copy of the previous drumPattern
+        newDrumPattern[instrument].timingOffsets = newDrumPattern[
+          instrument
+        ].pattern.map((_, index) =>
+          calculateTimingOffset(value, instrument, index, steps)
+        );
+        return newDrumPattern;
+      });
     }
     // Add more conditions here for other instruments
   };
@@ -36,7 +47,7 @@ const Groovarium = () => {
   useEffect(() => {
     if (allLoaded) {
       Object.keys(drumPattern).forEach((instrument) => {
-        drumPattern[instrument].forEach((play, index) => {
+        drumPattern[instrument].pattern.forEach((play, index) => {
           if (play) {
             const timeInTicks = index * 48; // Tone.js defaults to 192 ppq, which is equal to 48 ticks per sixteenth note
             const timingOffset = calculateTimingOffset(
@@ -90,6 +101,9 @@ const Groovarium = () => {
         pushPullValue={pushPullSnare}
       />
       {/* Render the new component */}
+      <div>
+        <pre>{JSON.stringify(drumPattern, null, 2)}</pre>
+      </div>
     </div>
   );
 };
