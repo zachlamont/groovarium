@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import PlayButton from "./PlayButton";
 import * as Tone from "tone";
 import BpmSlider from "./BpmSlider";
-import { drumPattern } from "../constants/groovarium";
+
 import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
 import PushPullKnob from "./PushPullKnob"; // Import the new component
 import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
@@ -12,13 +12,16 @@ import useDebounce from "../utils/groovarium/useDebounce";
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120); // Default BPM
-  const [pushPullSnare, setPushPullSnare] = useState(0); // New state for pushPullSnare
+  const [pushPullSnare, setPushPullSnare] = useState({
+    offset: 0,
+    steps: "1/8",
+  }); // Default to '1/8'
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant }); // Create a copy of drumPattern
   const debouncedPushPullSnare = useDebounce(pushPullSnare, 300); // Debounce pushPullSnare changes by 300ms
 
-  const setPushPull = (instrument, value) => {
+  const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
-      setPushPullSnare(value);
+      setPushPullSnare({ offset: value, steps: steps });
     }
     // Add more conditions here for other instruments
   };
@@ -37,9 +40,10 @@ const Groovarium = () => {
           if (play) {
             const timeInTicks = index * 48; // Tone.js defaults to 192 ppq, which is equal to 48 ticks per sixteenth note
             const timingOffset = calculateTimingOffset(
-              debouncedPushPullSnare,
+              debouncedPushPullSnare.offset,
               instrument,
-              index
+              index,
+              debouncedPushPullSnare.steps
             );
             const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
