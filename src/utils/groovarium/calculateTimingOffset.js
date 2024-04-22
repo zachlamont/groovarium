@@ -5,9 +5,10 @@ export function calculateTimingOffset(pushPull, instrument, index, steps) {
     backbeat: [5, 13, 21, 29],
   };
 
-  if (stepNumbers[steps].includes(index + 1)) {
+  if (steps && stepNumbers[steps].includes(index + 1)) {
     return pushPull;
   }
 
   return 0;
 }
+
