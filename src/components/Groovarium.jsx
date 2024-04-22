@@ -4,7 +4,7 @@ import * as Tone from "tone";
 import BpmSlider from "./BpmSlider";
 
 import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
-import PushPullKnob from "./PushPullKnob"; // Import the new component
+import PushPullKnob from "./PushPullKnob";
 import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
 import { drumPattern as drumPatternConstant } from "../constants/groovarium";
 import useDebounce from "../utils/groovarium/useDebounce";
@@ -12,39 +12,43 @@ import DrumPads from "./DrumPads";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [bpm, setBpm] = useState(120); // Default BPM
+  const [bpm, setBpm] = useState(120);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant }); // Create a copy of drumPattern
+  const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
     steps: "1/8",
-  }); // Default to '1/8'
-  const debouncedPushPullSnare = useDebounce(pushPullSnare, 600); // Debounce pushPullSnare changes by 300ms
+  });
+  const [pushPullHat, setPushPullHat] = useState({
+    offset: 0,
+    steps: "1/8",
+  });
+  const debouncedPushPullSnare = useDebounce(pushPullSnare, 600);
+  const debouncedPushPullHat = useDebounce(pushPullHat, 600);
 
   const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
       setPushPullSnare({ offset: value, steps: steps });
-
-      // Create a new drumPattern object with updated timingOffsets for the snare
-      setDrumPattern((prevDrumPattern) => {
-        const newDrumPattern = { ...prevDrumPattern }; // Create a copy of the previous drumPattern
-        newDrumPattern[instrument].timingOffsets = newDrumPattern[
-          instrument
-        ].pattern.map((_, index) =>
-          calculateTimingOffset(value, instrument, index, steps)
-        );
-        return newDrumPattern;
-      });
+    } else if (instrument === "hat") {
+      setPushPullHat({ offset: value, steps: steps });
     }
-    // Add more conditions here for other instruments
+
+    setDrumPattern((prevDrumPattern) => {
+      const newDrumPattern = { ...prevDrumPattern };
+      newDrumPattern[instrument].timingOffsets = newDrumPattern[
+        instrument
+      ].pattern.map((_, index) =>
+        calculateTimingOffset(value, instrument, index, steps)
+      );
+      return newDrumPattern;
+    });
   };
 
   const { players, allLoaded } = useSamplePlayers();
 
-  // This useEffect will update the BPM in Tone.Transport whenever bpm state changes
   useEffect(() => {
-    Tone.Transport.bpm.value = bpm; // Set the BPM value
+    Tone.Transport.bpm.value = bpm;
   }, [bpm]);
 
   useEffect(() => {
@@ -52,22 +56,26 @@ const Groovarium = () => {
       Object.keys(drumPattern).forEach((instrument) => {
         drumPattern[instrument].pattern.forEach((play, index) => {
           if (play) {
-            const timeInTicks = index * 48; // Tone.js defaults to 192 ppq, which is equal to 48 ticks per sixteenth note
+            const timeInTicks = index * 48;
             const timingOffset = calculateTimingOffset(
-              debouncedPushPullSnare.offset,
+              instrument === "snare"
+                ? debouncedPushPullSnare.offset
+                : debouncedPushPullHat.offset,
               instrument,
               index,
-              debouncedPushPullSnare.steps
+              instrument === "snare"
+                ? debouncedPushPullSnare.steps
+                : debouncedPushPullHat.steps
             );
             const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
               (time) => {
-                if (players[instrument].loaded) { // Check if the player is loaded before starting
-                players[instrument].start(time);
-                setCurrentStep(index);
+                if (players[instrument].loaded) {
+                  players[instrument].start(time);
+                  setCurrentStep(index);
                 }
               },
-              "2m", // Repeat after 2 measures
+              "2m",
               Tone.Ticks(offsetTimeInTicks).toSeconds()
             );
           }
@@ -75,16 +83,15 @@ const Groovarium = () => {
       });
     }
 
-    // Cleanup function
-  return () => {
-    Tone.Transport.cancel(0);
-    Object.values(players).forEach((player) => {
-      if (player.state === "started") { // Check if the player has started before disposing
-        player.dispose();
-      }
-    });
-  };
-}, [allLoaded, debouncedPushPullSnare, drumPattern]); // Added drumPattern to the dependency array
+    return () => {
+      Tone.Transport.cancel(0);
+      Object.values(players).forEach((player) => {
+        if (player.state === "started") {
+          player.dispose();
+        }
+      });
+    };
+  }, [allLoaded, debouncedPushPullSnare, debouncedPushPullHat, drumPattern]);
 
   const togglePlayback = async () => {
     await Tone.start();
@@ -119,13 +126,23 @@ const Groovarium = () => {
         setPushPull={setPushPull}
         pushPullValue={pushPullSnare}
       />
+      <PushPullKnob
+        instrument="hat"
+        setPushPull={setPushPull}
+        pushPullValue={pushPullHat}
+      />
       <DrumPads
         drumPattern={drumPattern}
         currentStep={currentStep}
         instrument="snare"
         onToggleDrumPad={toggleDrumPad}
       />
-
+      <DrumPads
+        drumPattern={drumPattern}
+        currentStep={currentStep}
+        instrument="hat"
+        onToggleDrumPad={toggleDrumPad}
+      />
       <div>
         <pre>{JSON.stringify(drumPattern, null, 2)}</pre>
       </div>
