@@ -9,6 +9,7 @@ import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset
 import { drumPattern as drumPatternConstant } from "../constants/groovarium";
 import useDebounce from "../utils/groovarium/useDebounce";
 import DrumPads from "./DrumPads";
+import HumanizeKnob from "./HumanizeKnob";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,11 +29,25 @@ const Groovarium = () => {
     offset: 0,
     steps: "1/8",
   });
+  const [amount, setAmount] = useState(0);
+  const [toggledInstruments, setToggledInstruments] = useState({
+    kick: false,
+    snare: false,
+    hat: false,
+    clap: false,
+  });
+
   const debouncedPushPullSnare = useDebounce(pushPullSnare, 600);
   const debouncedPushPullHat = useDebounce(pushPullHat, 600);
   const debouncedPushPullClap = useDebounce(pushPullClap, 600);
 
-  const setPushPull = (instrument, value, steps) => {
+  const setPushPull = (
+    instrument,
+    value,
+    steps,
+    amount,
+    toggledInstruments
+  ) => {
     if (instrument === "snare") {
       setPushPullSnare({ offset: value, steps: steps });
     } else if (instrument === "hat") {
@@ -46,7 +61,14 @@ const Groovarium = () => {
       newDrumPattern[instrument].timingOffsets = newDrumPattern[
         instrument
       ].pattern.map((_, index) =>
-        calculateTimingOffset(value, instrument, index, steps)
+        calculateTimingOffset(
+          value,
+          instrument,
+          index,
+          steps,
+          amount,
+          toggledInstruments
+        )
       );
       return newDrumPattern;
     });
@@ -54,9 +76,37 @@ const Groovarium = () => {
 
   const { players, allLoaded } = useSamplePlayers();
 
+  const toggleInstrument = (instrument) => {
+    setToggledInstruments((prev) => ({
+      ...prev,
+      [instrument]: !prev[instrument],
+    }));
+  };
+
   useEffect(() => {
     Tone.Transport.bpm.value = bpm;
   }, [bpm]);
+
+  useEffect(() => {
+    setDrumPattern((prevDrumPattern) => {
+      const newDrumPattern = { ...prevDrumPattern };
+      Object.keys(newDrumPattern).forEach((instrument) => {
+        newDrumPattern[instrument].timingOffsets = newDrumPattern[
+          instrument
+        ].pattern.map((_, index) =>
+          calculateTimingOffset(
+            newDrumPattern[instrument].offset,
+            instrument,
+            index,
+            newDrumPattern[instrument].steps,
+            amount,
+            toggledInstruments
+          )
+        );
+      });
+      return newDrumPattern;
+    });
+  }, [amount, toggledInstruments]);
 
   useEffect(() => {
     if (allLoaded) {
@@ -81,7 +131,9 @@ const Groovarium = () => {
               timingOffset,
               instrument,
               index,
-              steps
+              steps,
+              amount,
+              toggledInstruments
             );
             const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
@@ -113,6 +165,8 @@ const Groovarium = () => {
     debouncedPushPullHat,
     debouncedPushPullClap,
     drumPattern,
+    amount,
+    toggledInstruments,
   ]);
 
   const togglePlayback = async () => {
@@ -175,6 +229,18 @@ const Groovarium = () => {
         currentStep={currentStep}
         instrument="clap"
         onToggleDrumPad={toggleDrumPad}
+      />
+      <DrumPads
+        drumPattern={drumPattern}
+        currentStep={currentStep}
+        instrument="kick"
+        onToggleDrumPad={toggleDrumPad}
+      />
+      <HumanizeKnob
+        amount={amount}
+        setAmount={setAmount}
+        toggledInstruments={toggledInstruments}
+        toggleInstrument={toggleInstrument}
       />
       <div>
         <pre>{JSON.stringify(drumPattern, null, 2)}</pre>
