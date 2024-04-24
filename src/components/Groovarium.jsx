@@ -37,17 +37,11 @@ const Groovarium = () => {
     clap: false,
   });
 
-  const debouncedPushPullSnare = useDebounce(pushPullSnare, 600);
-  const debouncedPushPullHat = useDebounce(pushPullHat, 600);
-  const debouncedPushPullClap = useDebounce(pushPullClap, 600);
+  //const debouncedPushPullSnare = useDebounce(pushPullSnare, 600);
+  //const debouncedPushPullHat = useDebounce(pushPullHat, 600);
+  //const debouncedPushPullClap = useDebounce(pushPullClap, 600);
 
-  const setPushPull = (
-    instrument,
-    value,
-    steps,
-    amount,
-    toggledInstruments
-  ) => {
+  const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
       setPushPullSnare({ offset: value, steps: steps });
     } else if (instrument === "hat") {
@@ -60,16 +54,19 @@ const Groovarium = () => {
       const newDrumPattern = { ...prevDrumPattern };
       newDrumPattern[instrument].timingOffsets = newDrumPattern[
         instrument
-      ].pattern.map((_, index) =>
-        calculateTimingOffset(
+      ].pattern.map((_, index) => {
+        console.log(
+          `Value: ${value}, Instrument: ${instrument}, Index: ${index}, Steps: ${steps}`
+        ); // Add this line
+        return calculateTimingOffset(
           value,
           instrument,
           index,
           steps,
           amount,
           toggledInstruments
-        )
-      );
+        );
+      });
       return newDrumPattern;
     });
   };
@@ -114,27 +111,7 @@ const Groovarium = () => {
         drumPattern[instrument].pattern.forEach((play, index) => {
           if (play) {
             const timeInTicks = index * 48;
-            let timingOffset;
-            let steps;
-            if (instrument === "snare") {
-              timingOffset = debouncedPushPullSnare.offset;
-              steps = debouncedPushPullSnare.steps;
-            } else if (instrument === "hat") {
-              timingOffset = debouncedPushPullHat.offset;
-              steps = debouncedPushPullHat.steps;
-            } else if (instrument === "clap") {
-              timingOffset = debouncedPushPullClap.offset;
-              steps = debouncedPushPullClap.steps;
-            }
-            console.log(`Instrument: ${instrument}, Steps: ${steps}`); // Add this line
-            timingOffset = calculateTimingOffset(
-              timingOffset,
-              instrument,
-              index,
-              steps,
-              amount,
-              toggledInstruments
-            );
+            const timingOffset = drumPattern[instrument].timingOffsets[index];
             const offsetTimeInTicks = timeInTicks + timingOffset;
             Tone.Transport.scheduleRepeat(
               (time) => {
@@ -159,15 +136,7 @@ const Groovarium = () => {
         }
       });
     };
-  }, [
-    allLoaded,
-    debouncedPushPullSnare,
-    debouncedPushPullHat,
-    debouncedPushPullClap,
-    drumPattern,
-    amount,
-    toggledInstruments,
-  ]);
+  }, [allLoaded, drumPattern]);
 
   const togglePlayback = async () => {
     await Tone.start();
@@ -250,3 +219,5 @@ const Groovarium = () => {
 };
 
 export default Groovarium;
+
+
