@@ -49,6 +49,13 @@ const Groovarium = () => {
     hat: false,
     clap: false,
   });
+  const [swing8Amount, setSwing8Amount] = useState(0);
+  const [swing8ToggledInstruments, setSwing8ToggledInstruments] = useState({
+    kick: false,
+    snare: false,
+    hat: false,
+    clap: false,
+  });
 
   const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
@@ -75,7 +82,9 @@ const Groovarium = () => {
           amount,
           toggledInstruments,
           swingAmount,
-          swingToggledInstruments
+          swingToggledInstruments,
+          swing8Amount,
+          swing8ToggledInstruments
         );
       });
       return newDrumPattern;
@@ -110,7 +119,9 @@ const Groovarium = () => {
             amount,
             toggledInstruments,
             swingAmount,
-            swingToggledInstruments
+            swingToggledInstruments,
+            swing8Amount,
+            swing8ToggledInstruments
           )
         );
       });
@@ -133,13 +144,20 @@ const Groovarium = () => {
             amount,
             toggledInstruments,
             swingAmount,
-            swingToggledInstruments
+            swingToggledInstruments,
+            swing8Amount,
+            swing8ToggledInstruments
           )
         );
       });
       return newDrumPattern;
     });
-  }, [swingAmount, swingToggledInstruments]);
+  }, [
+    swingAmount,
+    swingToggledInstruments,
+    swing8Amount,
+    swing8ToggledInstruments,
+  ]);
 
   useEffect(() => {
     if (allLoaded) {
@@ -222,6 +240,10 @@ const Groovarium = () => {
         setSwingAmount={setSwingAmount}
         swingToggledInstruments={swingToggledInstruments}
         setSwingToggledInstruments={setSwingToggledInstruments}
+        swing8Amount={swing8Amount}
+        setSwing8Amount={setSwing8Amount}
+        swing8ToggledInstruments={swing8ToggledInstruments}
+        setSwing8ToggledInstruments={setSwing8ToggledInstruments}
       />
       <DrumPads
         drumPattern={drumPattern}

@@ -1,7 +1,16 @@
 // SwingControl.jsx
 import React from "react";
 
-const SwingControl = ({ swingAmount, setSwingAmount, swing8Amount, setSwing8Amount, swingToggledInstruments, setSwingToggledInstruments }) => {
+const SwingControl = ({
+  swingAmount,
+  setSwingAmount,
+  swing8Amount,
+  setSwing8Amount,
+  swingToggledInstruments,
+  setSwingToggledInstruments,
+  swing8ToggledInstruments,
+  setSwing8ToggledInstruments,
+}) => {
   const handleSliderChange = (event, is8thNote) => {
     if (is8thNote) {
       setSwing8Amount(parseInt(event.target.value));
@@ -10,11 +19,18 @@ const SwingControl = ({ swingAmount, setSwingAmount, swing8Amount, setSwing8Amou
     }
   };
 
-  const handleToggleChange = (instrument) => {
-    setSwingToggledInstruments(prev => ({
-      ...prev,
-      [instrument]: !prev[instrument]
-    }));
+  const handleToggleChange = (instrument, is8thNote) => {
+    if (is8thNote) {
+      setSwing8ToggledInstruments((prev) => ({
+        ...prev,
+        [instrument]: !prev[instrument],
+      }));
+    } else {
+      setSwingToggledInstruments((prev) => ({
+        ...prev,
+        [instrument]: !prev[instrument],
+      }));
+    }
   };
 
   return (
@@ -28,6 +44,18 @@ const SwingControl = ({ swingAmount, setSwingAmount, swing8Amount, setSwing8Amou
         onChange={(event) => handleSliderChange(event, false)}
       />
       <div>Current 16th note swing amount: {swingAmount}</div>
+      <div>
+        {["kick", "snare", "hat", "clap"].map((instrument) => (
+          <div key={instrument}>
+            <label>{instrument}</label>
+            <input
+              type="checkbox"
+              checked={swingToggledInstruments[instrument]}
+              onChange={() => handleToggleChange(instrument, false)}
+            />
+          </div>
+        ))}
+      </div>
       <label>8th Note Swing Amount</label>
       <input
         type="range"
@@ -38,13 +66,13 @@ const SwingControl = ({ swingAmount, setSwingAmount, swing8Amount, setSwing8Amou
       />
       <div>Current 8th note swing amount: {swing8Amount}</div>
       <div>
-        {['kick', 'snare', 'hat', 'clap'].map(instrument => (
+        {["kick", "snare", "hat", "clap"].map((instrument) => (
           <div key={instrument}>
             <label>{instrument}</label>
             <input
               type="checkbox"
-              checked={swingToggledInstruments[instrument]}
-              onChange={() => handleToggleChange(instrument)}
+              checked={swing8ToggledInstruments[instrument]}
+              onChange={() => handleToggleChange(instrument, true)}
             />
           </div>
         ))}
@@ -54,5 +82,3 @@ const SwingControl = ({ swingAmount, setSwingAmount, swing8Amount, setSwing8Amou
 };
 
 export default SwingControl;
-
-

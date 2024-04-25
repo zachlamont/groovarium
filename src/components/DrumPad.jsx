@@ -8,7 +8,7 @@ const DrumPad = ({
   timingOffset,
 }) => {
   const bgColor = isActive ? "bg-yellow-500" : "bg-slate-400";
-  const borderColor = isCurrent ? "border-yellow-500" : "border-transparent";
+  const borderColor = isCurrent ? "border-blue-500" : "border-transparent";
 
   return (
     <div
