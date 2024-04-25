@@ -7,9 +7,10 @@ import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
 import PushPullKnob from "./PushPullKnob";
 import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
 import { drumPattern as drumPatternConstant } from "../constants/groovarium";
-import useDebounce from "../utils/groovarium/useDebounce";
+//import useDebounce from "../utils/groovarium/useDebounce";
 import DrumPads from "./DrumPads";
 import HumanizeKnob from "./HumanizeKnob";
+import SwingControl from "./SwingControl";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -41,6 +42,14 @@ const Groovarium = () => {
   //const debouncedPushPullHat = useDebounce(pushPullHat, 600);
   //const debouncedPushPullClap = useDebounce(pushPullClap, 600);
 
+  const [swingAmount, setSwingAmount] = useState(0);
+  const [swingToggledInstruments, setSwingToggledInstruments] = useState({
+    kick: false,
+    snare: false,
+    hat: false,
+    clap: false,
+  });
+
   const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
       setPushPullSnare({ offset: value, steps: steps });
@@ -64,7 +73,9 @@ const Groovarium = () => {
           index,
           steps,
           amount,
-          toggledInstruments
+          toggledInstruments,
+          swingAmount,
+          swingToggledInstruments
         );
       });
       return newDrumPattern;
@@ -97,13 +108,38 @@ const Groovarium = () => {
             index,
             newDrumPattern[instrument].steps,
             amount,
-            toggledInstruments
+            toggledInstruments,
+            swingAmount,
+            swingToggledInstruments
           )
         );
       });
       return newDrumPattern;
     });
   }, [amount, toggledInstruments]);
+
+  useEffect(() => {
+    setDrumPattern((prevDrumPattern) => {
+      const newDrumPattern = { ...prevDrumPattern };
+      Object.keys(newDrumPattern).forEach((instrument) => {
+        newDrumPattern[instrument].timingOffsets = newDrumPattern[
+          instrument
+        ].pattern.map((_, index) =>
+          calculateTimingOffset(
+            newDrumPattern[instrument].offset,
+            instrument,
+            index,
+            newDrumPattern[instrument].steps,
+            amount,
+            toggledInstruments,
+            swingAmount,
+            swingToggledInstruments
+          )
+        );
+      });
+      return newDrumPattern;
+    });
+  }, [swingAmount, swingToggledInstruments]);
 
   useEffect(() => {
     if (allLoaded) {
@@ -180,6 +216,12 @@ const Groovarium = () => {
         instrument="clap"
         setPushPull={setPushPull}
         pushPullValue={pushPullClap}
+      />
+      <SwingControl
+        swingAmount={swingAmount}
+        setSwingAmount={setSwingAmount}
+        swingToggledInstruments={swingToggledInstruments}
+        setSwingToggledInstruments={setSwingToggledInstruments}
       />
       <DrumPads
         drumPattern={drumPattern}

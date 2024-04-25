@@ -22,6 +22,20 @@ function calculateHumanizationOffset(amount, toggledInstruments, instrument) {
   return 0;
 }
 
+// calculateTimingOffset.js
+function calculateSwingOffset(
+  swingAmount,
+  swingToggledInstruments,
+  instrument,
+  index
+) {
+  if (swingToggledInstruments[instrument] && index % 2 === 1) {
+    return swingAmount;
+  }
+
+  return 0;
+}
+
 // Main function to calculate total offset
 export function calculateTimingOffset(
   pushPull,
@@ -29,7 +43,9 @@ export function calculateTimingOffset(
   index,
   steps,
   amount,
-  toggledInstruments
+  toggledInstruments,
+  swingAmount,
+  swingToggledInstruments
 ) {
   const pushPullOffset = calculatePushPullOffset(pushPull, index, steps);
   const humanizationOffset = calculateHumanizationOffset(
@@ -37,6 +53,12 @@ export function calculateTimingOffset(
     toggledInstruments,
     instrument
   );
+  const swingOffset = calculateSwingOffset(
+    swingAmount,
+    swingToggledInstruments,
+    instrument,
+    index
+  );
 
-  return pushPullOffset + humanizationOffset;
+  return pushPullOffset + humanizationOffset + swingOffset;
 }
