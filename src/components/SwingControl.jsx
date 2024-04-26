@@ -1,5 +1,5 @@
-// SwingControl.jsx
 import React from "react";
+import XYPad from "./XyPad"; // Import the custom XYPad component
 
 const SwingControl = ({
   swingAmount,
@@ -11,12 +11,9 @@ const SwingControl = ({
   swing8ToggledInstruments,
   setSwing8ToggledInstruments,
 }) => {
-  const handleSliderChange = (event, is8thNote) => {
-    if (is8thNote) {
-      setSwing8Amount(parseInt(event.target.value));
-    } else {
-      setSwingAmount(parseInt(event.target.value));
-    }
+  const handleXYChange = (values) => {
+    setSwingAmount(Math.round(values.x * 24)); // Scale x from 0 to 1 to 0 to 24
+    setSwing8Amount(Math.round(values.y * 48)); // Scale y from 0 to 1 to 0 to 48
   };
 
   const handleToggleChange = (instrument, is8thNote) => {
@@ -34,15 +31,15 @@ const SwingControl = ({
   };
 
   return (
-    <div className="bg-emerald-600">
-      <label>16th Note Swing Amount</label>
-      <input
-        type="range"
-        min="0"
-        max="24"
-        value={swingAmount}
-        onChange={(event) => handleSliderChange(event, false)}
+    <div className="bg-emerald-600 p-4">
+      <XYPad
+        width={300}
+        height={300}
+        onChange={handleXYChange}
+        initialX={(swingAmount / 24) * 300}
+        initialY={(1 - swing8Amount / 48) * 300} // Invert initial Y to align with XY pad logic
       />
+
       <div>Current 16th note swing amount: {swingAmount}</div>
       <div>
         {["kick", "snare", "hat", "clap"].map((instrument) => (
@@ -56,14 +53,6 @@ const SwingControl = ({
           </div>
         ))}
       </div>
-      <label>8th Note Swing Amount</label>
-      <input
-        type="range"
-        min="0"
-        max="48"
-        value={swing8Amount}
-        onChange={(event) => handleSliderChange(event, true)}
-      />
       <div>Current 8th note swing amount: {swing8Amount}</div>
       <div>
         {["kick", "snare", "hat", "clap"].map((instrument) => (

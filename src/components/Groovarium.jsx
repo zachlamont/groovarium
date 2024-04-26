@@ -44,17 +44,17 @@ const Groovarium = () => {
 
   const [swingAmount, setSwingAmount] = useState(0);
   const [swingToggledInstruments, setSwingToggledInstruments] = useState({
-    kick: false,
-    snare: false,
-    hat: false,
-    clap: false,
+    kick: true,
+    snare: true,
+    hat: true,
+    clap: true,
   });
   const [swing8Amount, setSwing8Amount] = useState(0);
   const [swing8ToggledInstruments, setSwing8ToggledInstruments] = useState({
-    kick: false,
-    snare: false,
-    hat: false,
-    clap: false,
+    kick: true,
+    snare: true,
+    hat: true,
+    clap: true,
   });
 
   const setPushPull = (instrument, value, steps) => {
