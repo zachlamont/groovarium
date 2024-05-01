@@ -47,3 +47,4 @@ const DrumPads = ({
 };
 
 export default DrumPads;
+

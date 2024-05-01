@@ -65,6 +65,3 @@ const XYPad = ({ width, height, onChange }) => {
 };
 
 export default XYPad;
-
-
-
