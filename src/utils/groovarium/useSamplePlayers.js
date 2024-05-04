@@ -32,7 +32,7 @@ const useSamplePlayers = (drumPattern, setCurrentStep, selectedSamples) => {
   useEffect(() => {
     console.log(selectedSamples); //Correctly returns the selected samples
     console.log(drumPattern); //Correctly returns the drum pattern
-    console.log(allLoaded); //Returns FALSE :(
+    console.log(allLoaded);
     if (allLoaded) {
       Object.keys(drumPattern).forEach((instrument) => {
         drumPattern[instrument].pattern.forEach((play, index) => {
@@ -63,7 +63,7 @@ const useSamplePlayers = (drumPattern, setCurrentStep, selectedSamples) => {
         }
       });
     };
-  }, [allLoaded, drumPattern, setCurrentStep, selectedSamples]);
+  }, [allLoaded, drumPattern, selectedSamples]);
 
   return { players, allLoaded };
 };

@@ -70,6 +70,7 @@ const Groovarium = () => {
     }
 
     setDrumPattern((prevDrumPattern) => {
+      console.log("setdumpaty called");
       const newDrumPattern = { ...prevDrumPattern };
       newDrumPattern[instrument].timingOffsets = newDrumPattern[
         instrument
@@ -117,8 +118,8 @@ const Groovarium = () => {
       Object.keys(newDrumPattern).forEach((instrument) => {
         newDrumPattern[instrument].timingOffsets = newDrumPattern[
           instrument
-        ].pattern.map((_, index) =>
-          calculateTimingOffset(
+        ].pattern.map((_, index) => {
+          return calculateTimingOffset(
             newDrumPattern[instrument].offset,
             instrument,
             index,
@@ -129,37 +130,14 @@ const Groovarium = () => {
             swingToggledInstruments,
             swing8Amount,
             swing8ToggledInstruments
-          )
-        );
-      });
-      return newDrumPattern;
-    });
-  }, [amount, toggledInstruments]);
-
-  useEffect(() => {
-    setDrumPattern((prevDrumPattern) => {
-      const newDrumPattern = { ...prevDrumPattern };
-      Object.keys(newDrumPattern).forEach((instrument) => {
-        newDrumPattern[instrument].timingOffsets = newDrumPattern[
-          instrument
-        ].pattern.map((_, index) =>
-          calculateTimingOffset(
-            newDrumPattern[instrument].offset,
-            instrument,
-            index,
-            newDrumPattern[instrument].steps,
-            amount,
-            toggledInstruments,
-            swingAmount,
-            swingToggledInstruments,
-            swing8Amount,
-            swing8ToggledInstruments
-          )
-        );
+          );
+        });
       });
       return newDrumPattern;
     });
   }, [
+    amount,
+    toggledInstruments,
     swingAmount,
     swingToggledInstruments,
     swing8Amount,
@@ -177,6 +155,7 @@ const Groovarium = () => {
   };
 
   const toggleDrumPad = (instrument, index) => {
+    console.log("toggle drum pad called at", instrument, index);
     setDrumPattern((prevPattern) => {
       const newPattern = { ...prevPattern };
       newPattern[instrument].pattern[index] =
