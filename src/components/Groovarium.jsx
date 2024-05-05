@@ -98,7 +98,8 @@ const Groovarium = () => {
   const { players, allLoaded } = useSamplePlayers(
     drumPattern,
     setCurrentStep,
-    selectedSamples
+    selectedSamples,
+    isGhostNotes
   );
 
   const toggleInstrument = (instrument) => {

@@ -12,6 +12,7 @@ const SelectGhostNotes = ({ isGhostNotes, setIsGhostNotes }) => {
         Ghost Notes
         <input type="checkbox" checked={isGhostNotes} onChange={handleToggle} />
       </label>
+      
     </div>
   );
 };
