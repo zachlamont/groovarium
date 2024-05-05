@@ -7,16 +7,23 @@ import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
 import PushPullKnob from "./PushPullKnob";
 import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
 import { drumPattern as drumPatternConstant } from "../constants/groovarium";
-//import useDebounce from "../utils/groovarium/useDebounce";
 import DrumPads from "./DrumPads";
 import HumanizeKnob from "./HumanizeKnob";
 import SwingControl from "./SwingControl";
+import SelectGhostNotes from "./SelectGhostNotes";
+import SampleSelector from "./SampleSelector";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
+  const [selectedSamples, setSelectedSamples] = useState({
+    kick: "funk",
+    snare: "funk",
+    hat: "funk",
+    clap: "funk",
+  });
   const [currentStep, setCurrentStep] = useState(0);
-
+  const [isGhostNotes, setIsGhostNotes] = useState(false);
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
@@ -37,10 +44,6 @@ const Groovarium = () => {
     hat: false,
     clap: false,
   });
-
-  //const debouncedPushPullSnare = useDebounce(pushPullSnare, 600);
-  //const debouncedPushPullHat = useDebounce(pushPullHat, 600);
-  //const debouncedPushPullClap = useDebounce(pushPullClap, 600);
 
   const [swingAmount, setSwingAmount] = useState(0);
   const [swingToggledInstruments, setSwingToggledInstruments] = useState({
@@ -67,6 +70,7 @@ const Groovarium = () => {
     }
 
     setDrumPattern((prevDrumPattern) => {
+      console.log("setdumpaty called");
       const newDrumPattern = { ...prevDrumPattern };
       newDrumPattern[instrument].timingOffsets = newDrumPattern[
         instrument
@@ -91,7 +95,11 @@ const Groovarium = () => {
     });
   };
 
-  const { players, allLoaded } = useSamplePlayers();
+  const { players, allLoaded } = useSamplePlayers(
+    drumPattern,
+    setCurrentStep,
+    selectedSamples
+  );
 
   const toggleInstrument = (instrument) => {
     setToggledInstruments((prev) => ({
@@ -110,8 +118,8 @@ const Groovarium = () => {
       Object.keys(newDrumPattern).forEach((instrument) => {
         newDrumPattern[instrument].timingOffsets = newDrumPattern[
           instrument
-        ].pattern.map((_, index) =>
-          calculateTimingOffset(
+        ].pattern.map((_, index) => {
+          return calculateTimingOffset(
             newDrumPattern[instrument].offset,
             instrument,
             index,
@@ -122,75 +130,19 @@ const Groovarium = () => {
             swingToggledInstruments,
             swing8Amount,
             swing8ToggledInstruments
-          )
-        );
-      });
-      return newDrumPattern;
-    });
-  }, [amount, toggledInstruments]);
-
-  useEffect(() => {
-    setDrumPattern((prevDrumPattern) => {
-      const newDrumPattern = { ...prevDrumPattern };
-      Object.keys(newDrumPattern).forEach((instrument) => {
-        newDrumPattern[instrument].timingOffsets = newDrumPattern[
-          instrument
-        ].pattern.map((_, index) =>
-          calculateTimingOffset(
-            newDrumPattern[instrument].offset,
-            instrument,
-            index,
-            newDrumPattern[instrument].steps,
-            amount,
-            toggledInstruments,
-            swingAmount,
-            swingToggledInstruments,
-            swing8Amount,
-            swing8ToggledInstruments
-          )
-        );
+          );
+        });
       });
       return newDrumPattern;
     });
   }, [
+    amount,
+    toggledInstruments,
     swingAmount,
     swingToggledInstruments,
     swing8Amount,
     swing8ToggledInstruments,
   ]);
-
-  useEffect(() => {
-    if (allLoaded) {
-      Object.keys(drumPattern).forEach((instrument) => {
-        drumPattern[instrument].pattern.forEach((play, index) => {
-          if (play) {
-            const timeInTicks = index * 48;
-            const timingOffset = drumPattern[instrument].timingOffsets[index];
-            const offsetTimeInTicks = timeInTicks + timingOffset;
-            Tone.Transport.scheduleRepeat(
-              (time) => {
-                if (players[instrument].loaded) {
-                  players[instrument].start(time);
-                  setCurrentStep(index);
-                }
-              },
-              "2m",
-              Tone.Ticks(offsetTimeInTicks).toSeconds()
-            );
-          }
-        });
-      });
-    }
-
-    return () => {
-      Tone.Transport.cancel(0);
-      Object.values(players).forEach((player) => {
-        if (player.state === "started") {
-          player.dispose();
-        }
-      });
-    };
-  }, [allLoaded, drumPattern]);
 
   const togglePlayback = async () => {
     await Tone.start();
@@ -203,12 +155,10 @@ const Groovarium = () => {
   };
 
   const toggleDrumPad = (instrument, index) => {
-    setDrumPattern((prevPattern) => {
-      const newPattern = { ...prevPattern };
-      newPattern[instrument].pattern[index] =
-        !newPattern[instrument].pattern[index];
-      return newPattern;
-    });
+    const newPattern = { ...drumPattern };
+    newPattern[instrument].pattern[index] =
+      !newPattern[instrument].pattern[index];
+    setDrumPattern(newPattern);
   };
 
   return (
@@ -220,6 +170,14 @@ const Groovarium = () => {
         disabled={!allLoaded}
       />
       <BpmSlider selectedBPM={bpm} setSelectedBPM={setBpm} />
+      <SelectGhostNotes
+        isGhostNotes={isGhostNotes}
+        setIsGhostNotes={setIsGhostNotes}
+      />
+      <SampleSelector
+        selectedSamples={selectedSamples}
+        setSelectedSamples={setSelectedSamples}
+      />
       <PushPullKnob
         instrument="snare"
         setPushPull={setPushPull}
