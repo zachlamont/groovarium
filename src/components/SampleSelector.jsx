@@ -22,7 +22,7 @@ const SampleSelector = ({ selectedSamples, setSelectedSamples }) => {
   const handleSampleChange = (instrument, direction) => {
     const kits = Object.keys(drumKits);
     const currentKitIndex = kits.indexOf(selectedSamples[instrument]);
-    let newKitIndex = currentKitIndex + direction;
+    let newKitIndex = currentKitIndex + direction; 
     if (newKitIndex < 0) newKitIndex = kits.length - 1;
     if (newKitIndex >= kits.length) newKitIndex = 0;
     setSelectedSamples({
@@ -55,6 +55,10 @@ const SampleSelector = ({ selectedSamples, setSelectedSamples }) => {
             </button>
           </div>
         ))}
+      </div>
+      <div>
+        <h3>Current selectedSamples state:</h3>
+        <pre>{JSON.stringify(selectedSamples, null, 2)}</pre>
       </div>
     </div>
   );

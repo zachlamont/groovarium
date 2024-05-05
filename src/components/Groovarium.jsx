@@ -155,13 +155,10 @@ const Groovarium = () => {
   };
 
   const toggleDrumPad = (instrument, index) => {
-    console.log("toggle drum pad called at", instrument, index);
-    setDrumPattern((prevPattern) => {
-      const newPattern = { ...prevPattern };
-      newPattern[instrument].pattern[index] =
-        !newPattern[instrument].pattern[index];
-      return newPattern;
-    });
+    const newPattern = { ...drumPattern };
+    newPattern[instrument].pattern[index] =
+      !newPattern[instrument].pattern[index];
+    setDrumPattern(newPattern);
   };
 
   return (
