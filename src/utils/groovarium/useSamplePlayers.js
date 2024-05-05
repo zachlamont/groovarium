@@ -18,6 +18,18 @@ const useSamplePlayers = (drumPattern, setCurrentStep, selectedSamples) => {
       hat: new Tone.Player("/samples/hat/hiphop.wav").toDestination(),
       clap: new Tone.Player("/samples/clap/hiphop.wav").toDestination(),
     },
+    rock: {
+      kick: new Tone.Player("/samples/kick/rock.wav").toDestination(),
+      snare: new Tone.Player("/samples/snare/rock.wav").toDestination(),
+      hat: new Tone.Player("/samples/hat/rock.wav").toDestination(),
+      clap: new Tone.Player("/samples/clap/rock.wav").toDestination(),
+    },
+    jazz: {
+      kick: new Tone.Player("/samples/kick/jazz.wav").toDestination(),
+      snare: new Tone.Player("/samples/snare/jazz.wav").toDestination(),
+      hat: new Tone.Player("/samples/hat/jazz.wav").toDestination(),
+      clap: new Tone.Player("/samples/clap/jazz.wav").toDestination(),
+    },
   };
 
   useEffect(() => {
