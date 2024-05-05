@@ -14,6 +14,7 @@ import HumanizeKnob from "./HumanizeKnob";
 import SwingControl from "./SwingControl";
 import SelectGhostNotes from "./SelectGhostNotes";
 import SampleSelector from "./SampleSelector";
+import GenreSelector from "./GenreSelector";
 import PresetSelector from "./PresetSelector";
 
 const Groovarium = () => {
@@ -27,6 +28,8 @@ const Groovarium = () => {
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [isGhostNotes, setIsGhostNotes] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState("Pop");
+  const [selectedPresetId, setSelectedPresetId] = useState(1);
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
@@ -65,8 +68,21 @@ const Groovarium = () => {
 
   // const [presetId, setPresetId] = useState(presets[0].id);
 
-  const handlePresetSelect = (id) => {
-    const preset = presets.find((preset) => preset.id === Number(id));
+  const handlePresetSelect = (id, selectedGenre) => {
+    setSelectedPresetId(id);
+    console.log("the selected genre is", selectedGenre);
+    console.log("the id is", id);
+    console.log("the selected genre is", selectedGenre);
+    const genrePresets = presets[selectedGenre] || [];
+    const preset = genrePresets.find((preset) => preset.id === Number(id));
+
+    if (!preset) {
+      console.error(
+        `No preset found with id: ${id} for genre: ${selectedGenre}` // selectedGenre is undefined
+      );
+      return;
+    }
+
     setBpm(preset.bpm);
     setSelectedSamples(preset.selectedSamples);
     setIsGhostNotes(preset.isGhostNotes);
@@ -194,7 +210,15 @@ const Groovarium = () => {
       />
       <BpmSlider selectedBPM={bpm} setSelectedBPM={setBpm} />
 
-      <PresetSelector onPresetSelect={handlePresetSelect} />
+      <GenreSelector
+        selectedGenre={selectedGenre}
+        onGenreSelect={setSelectedGenre}
+      />
+      <PresetSelector
+        onPresetSelect={handlePresetSelect}
+        selectedGenre={selectedGenre}
+        selectedPresetId={selectedPresetId}
+      />
 
       <SelectGhostNotes
         isGhostNotes={isGhostNotes}

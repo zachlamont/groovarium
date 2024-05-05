@@ -1,10 +1,19 @@
-import React from 'react';
-import { presets } from '../constants/groovarium';
+import React from "react";
+import { presets } from "../constants/groovarium";
 
-const PresetSelector = ({ onPresetSelect }) => {
+const PresetSelector = ({
+  onPresetSelect,
+  selectedGenre,
+  selectedPresetId,
+}) => {
+  const genrePresets = presets[selectedGenre] || [];
+
   return (
-    <select onChange={(e) => onPresetSelect(e.target.value)}>
-      {presets.map((preset) => (
+    <select
+      value={selectedPresetId}
+      onChange={(e) => onPresetSelect(e.target.value, selectedGenre)}
+    >
+      {genrePresets.map((preset) => (
         <option key={preset.id} value={preset.id}>
           {preset.name}
         </option>
@@ -14,4 +23,3 @@ const PresetSelector = ({ onPresetSelect }) => {
 };
 
 export default PresetSelector;
-
