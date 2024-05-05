@@ -36,8 +36,8 @@ const SwingControl = ({
         width={300}
         height={300}
         onChange={handleXYChange}
-        initialX={(swingAmount / 24) * 300}
-        initialY={(1 - swing8Amount / 48) * 300} // Invert initial Y to align with XY pad logic
+        swingAmount={(swingAmount / 24) * 300}
+        swing8Amount={(swing8Amount / 48) * 300} // Invert initial Y to align with XY pad logic
       />
 
       <div>Current 16th note swing amount: {swingAmount}</div>

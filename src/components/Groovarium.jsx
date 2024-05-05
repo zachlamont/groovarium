@@ -7,11 +7,14 @@ import useSamplePlayers from "../utils/groovarium/useSamplePlayers";
 import PushPullKnob from "./PushPullKnob";
 import { calculateTimingOffset } from "../utils/groovarium/calculateTimingOffset";
 import { drumPattern as drumPatternConstant } from "../constants/groovarium";
+import { presets } from "../constants/groovarium";
+
 import DrumPads from "./DrumPads";
 import HumanizeKnob from "./HumanizeKnob";
 import SwingControl from "./SwingControl";
 import SelectGhostNotes from "./SelectGhostNotes";
 import SampleSelector from "./SampleSelector";
+import PresetSelector from "./PresetSelector";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -59,6 +62,25 @@ const Groovarium = () => {
     hat: true,
     clap: true,
   });
+
+  // const [presetId, setPresetId] = useState(presets[0].id);
+
+  const handlePresetSelect = (id) => {
+    const preset = presets.find((preset) => preset.id === Number(id));
+    setBpm(preset.bpm);
+    setSelectedSamples(preset.selectedSamples);
+    setIsGhostNotes(preset.isGhostNotes);
+    setDrumPattern(preset.drumPattern);
+    setPushPullSnare(preset.pushPullSnare);
+    setPushPullHat(preset.pushPullHat);
+    setPushPullClap(preset.pushPullClap);
+    setSwingAmount(preset.swingAmount);
+    setSwingToggledInstruments(preset.swingToggledInstruments);
+    setSwing8Amount(preset.swing8Amount);
+    setSwing8ToggledInstruments(preset.swing8ToggledInstruments);
+    setAmount(preset.amount);
+    setToggledInstruments(preset.toggledInstruments);
+  };
 
   const setPushPull = (instrument, value, steps) => {
     if (instrument === "snare") {
@@ -171,6 +193,9 @@ const Groovarium = () => {
         disabled={!allLoaded}
       />
       <BpmSlider selectedBPM={bpm} setSelectedBPM={setBpm} />
+
+      <PresetSelector onPresetSelect={handlePresetSelect} />
+
       <SelectGhostNotes
         isGhostNotes={isGhostNotes}
         setIsGhostNotes={setIsGhostNotes}
@@ -235,7 +260,27 @@ const Groovarium = () => {
         toggleInstrument={toggleInstrument}
       />
       <div>
-        <pre>{JSON.stringify(drumPattern, null, 2)}</pre>
+        <pre>
+          {JSON.stringify(
+            {
+              bpm,
+              selectedSamples,
+              isGhostNotes,
+              drumPattern,
+              pushPullSnare,
+              pushPullHat,
+              pushPullClap,
+              swingAmount,
+              swingToggledInstruments,
+              swing8Amount,
+              swing8ToggledInstruments,
+              amount,
+              toggledInstruments,
+            },
+            null,
+            2
+          )}
+        </pre>
       </div>
     </div>
   );

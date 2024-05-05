@@ -17,7 +17,7 @@ const PushPullKnob = ({ instrument, setPushPull, pushPullValue }) => {
         type="range"
         min="-24"
         max="24"
-        defaultValue="0"
+        value={pushPullValue.offset} // Changed from defaultValue to value
         onChange={handleOnChange}
       />
       <select value={pushPullValue.steps} onChange={handleSelectChange}>

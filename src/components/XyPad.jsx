@@ -1,25 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
+//import debounce from "lodash.debounce";
 
-const XYPad = ({ width, height, onChange }) => {
+const XYPad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
   const padRef = useRef(null);
-  // Set initial Y to height (bottom of the pad) and X to 0 (left of the pad)
-  const [position, setPosition] = useState({ x: 0, y: height });
-
+  const [position, setPosition] = useState({
+    x: swingAmount,
+    y: height - swing8Amount,
+  });
   const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
+    setPosition({ x: swingAmount, y: height - swing8Amount });
+
     const handleMouseMove = (event) => {
       if (dragging) {
-        const rect = padRef.current.getBoundingClientRect();
-        let newX = event.clientX - rect.left;
-        let newY = height - (event.clientY - rect.top); // Reverse the Y-coordinate
+        requestAnimationFrame(() => {
+          const rect = padRef.current.getBoundingClientRect();
+          let newX = event.clientX - rect.left;
+          let newY = height - (event.clientY - rect.top); // Reverse the Y-coordinate
 
-        // Constrain the handle within the pad boundaries
-        newX = Math.max(0, Math.min(newX, width));
-        newY = Math.max(0, Math.min(newY, height));
+          // Constrain the handle within the pad boundaries
+          newX = Math.max(0, Math.min(newX, width));
+          newY = Math.max(0, Math.min(newY, height));
 
-        setPosition({ x: newX, y: height - newY }); // Store position with inverted Y
-        onChange({ x: newX / width, y: newY / height }); // Normalize newY before sending
+          setPosition({ x: newX, y: height - newY }); // Store position with inverted Y
+          onChange({ x: newX / width, y: newY / height }); // Normalize newY before sending
+        });
       }
     };
 
@@ -34,7 +40,7 @@ const XYPad = ({ width, height, onChange }) => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [dragging, width, height, onChange]);
+  }, [dragging, width, height, onChange, swingAmount, swing8Amount]);
 
   const handleMouseDown = (event) => {
     setDragging(true);
