@@ -12,7 +12,7 @@ const DrumPad = ({
 
   return (
     <div
-      className={`w-8 h-8 m-1 border-2 ${bgColor} ${borderColor} select-none`} // Added 'select-none' here
+    className={`flex-grow w-8 h-8 m-1 border-2 ${bgColor} ${borderColor} select-none`}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
     >

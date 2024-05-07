@@ -39,7 +39,7 @@ const DrumPads = ({
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center w-full">
       {drumPattern[instrument].pattern.map((isActive, index) => {
         return (
           <DrumPad

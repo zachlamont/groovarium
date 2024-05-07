@@ -16,6 +16,7 @@ import SelectGhostNotes from "./SelectGhostNotes";
 import SampleSelector from "./SampleSelector";
 import GenreSelector from "./GenreSelector";
 import PresetSelector from "./PresetSelector";
+import SelectTwoBars from "./SelectTwoBars";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,6 +32,7 @@ const Groovarium = () => {
   const [selectedGenre, setSelectedGenre] = useState("Pop");
   const [selectedPresetId, setSelectedPresetId] = useState(1);
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
+  const [isTwoBars, setIsTwoBars] = useState(false);
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
     steps: "1/8",
@@ -147,6 +149,10 @@ const Groovarium = () => {
     }));
   };
 
+  const toggleTwoBars = () => {
+    setIsTwoBars(!isTwoBars);
+  };
+
   useEffect(() => {
     Tone.Transport.bpm.value = bpm;
   }, [bpm]);
@@ -253,30 +259,37 @@ const Groovarium = () => {
         swing8ToggledInstruments={swing8ToggledInstruments}
         setSwing8ToggledInstruments={setSwing8ToggledInstruments}
       />
-      <DrumPads
-        drumPattern={drumPattern}
-        currentStep={currentStep}
-        instrument="snare"
-        onToggleDrumPad={toggleDrumPad}
-      />
-      <DrumPads
-        drumPattern={drumPattern}
-        currentStep={currentStep}
-        instrument="hat"
-        onToggleDrumPad={toggleDrumPad}
-      />
-      <DrumPads
-        drumPattern={drumPattern}
-        currentStep={currentStep}
-        instrument="clap"
-        onToggleDrumPad={toggleDrumPad}
-      />
-      <DrumPads
-        drumPattern={drumPattern}
-        currentStep={currentStep}
-        instrument="kick"
-        onToggleDrumPad={toggleDrumPad}
-      />
+      <SelectTwoBars isTwoBars={isTwoBars} toggleTwoBars={toggleTwoBars} />
+      <div
+        className={`drum-pads-container ${isTwoBars ? "show-second-bar" : ""}`}
+      >
+        <div className="drum-pads-slide">
+          <DrumPads
+            drumPattern={drumPattern}
+            currentStep={currentStep}
+            instrument="snare"
+            onToggleDrumPad={toggleDrumPad}
+          />
+          <DrumPads
+            drumPattern={drumPattern}
+            currentStep={currentStep}
+            instrument="hat"
+            onToggleDrumPad={toggleDrumPad}
+          />
+          <DrumPads
+            drumPattern={drumPattern}
+            currentStep={currentStep}
+            instrument="clap"
+            onToggleDrumPad={toggleDrumPad}
+          />
+          <DrumPads
+            drumPattern={drumPattern}
+            currentStep={currentStep}
+            instrument="kick"
+            onToggleDrumPad={toggleDrumPad}
+          />
+        </div>
+      </div>
       <HumanizeKnob
         amount={amount}
         setAmount={setAmount}

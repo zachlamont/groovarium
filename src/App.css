@@ -44,3 +44,24 @@
 .read-the-docs {
   color: #888;
 }
+
+/* -------------------------------------------------------------------- */
+.drum-pads-container {
+  width: 100%; /* takes up the full width of its parent */
+  overflow: hidden;
+  min-height: 400px;
+}
+
+.drum-pads-slide {
+  width: 200%; /* two times the width of drum-pads-container */
+  display: flex;
+  transition: transform 0.3s ease-out;
+  min-height: 400px;
+  flex-direction: column;
+}
+
+.show-second-bar .drum-pads-slide {
+  transform: translateX(
+    -50%
+  ); /* moves the slide to the left to show the second half */
+}
