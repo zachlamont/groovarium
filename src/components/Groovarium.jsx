@@ -33,6 +33,7 @@ const Groovarium = () => {
   const [selectedPresetId, setSelectedPresetId] = useState(1);
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
   const [isTwoBars, setIsTwoBars] = useState(false);
+  const [loopLength, setLoopLength] = useState(2);
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
     steps: "1/8",
@@ -139,7 +140,8 @@ const Groovarium = () => {
     drumPattern,
     setCurrentStep,
     selectedSamples,
-    isGhostNotes
+    isGhostNotes,
+    loopLength
   );
 
   const toggleInstrument = (instrument) => {

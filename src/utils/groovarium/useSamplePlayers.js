@@ -6,7 +6,8 @@ const useSamplePlayers = (
   drumPattern,
   setCurrentStep,
   selectedSamples,
-  isGhostNotes
+  isGhostNotes,
+  loopLength
 ) => {
   const [allLoaded, setAllLoaded] = useState(false);
 
@@ -63,32 +64,45 @@ const useSamplePlayers = (
   }, []);
 
   useEffect(() => {
-    console.log(selectedSamples); //Correctly returns the selected samples
-    console.log(drumPattern); //Correctly returns the drum pattern
-    console.log(allLoaded);
     if (allLoaded) {
+      console.log("the loop length is", loopLength);
       Object.keys(drumPattern).forEach((instrument) => {
         drumPattern[instrument].pattern.forEach((play, index) => {
-          if (play) {
+          // Only schedule the steps within the loop length
+          if (index < loopLength * 16) {
             const timeInTicks = index * 48;
             const timingOffset = drumPattern[instrument].timingOffsets[index];
             const offsetTimeInTicks = timeInTicks + timingOffset;
-            const instrumentName =
-              isGhostNotes && index % 2 === 1 ? `${instrument}_mv` : instrument;
+
+            // Schedule the setCurrentStep for every step (for blue border)
             Tone.Transport.scheduleRepeat(
-              (time) => {
-                if (
-                  players[selectedSamples[instrument]][instrumentName].loaded
-                ) {
-                  players[selectedSamples[instrument]][instrumentName].start(
-                    time
-                  );
-                  setCurrentStep(index);
-                }
+              () => {
+                setCurrentStep(index);
               },
-              "2m",
-              Tone.Ticks(offsetTimeInTicks).toSeconds()
+              `${loopLength}m`, // Sets the loop length dynamically
+              Tone.Ticks(timeInTicks).toSeconds()
             );
+
+            // Schedule the note playing only if the step is set to play
+            if (play) {
+              const instrumentName =
+                isGhostNotes && index % 2 === 1
+                  ? `${instrument}_mv`
+                  : instrument;
+              Tone.Transport.scheduleRepeat(
+                (time) => {
+                  if (
+                    players[selectedSamples[instrument]][instrumentName].loaded
+                  ) {
+                    players[selectedSamples[instrument]][instrumentName].start(
+                      time
+                    );
+                  }
+                },
+                `${loopLength}m`, // Sets the loop length dynamically
+                Tone.Ticks(offsetTimeInTicks).toSeconds()
+              );
+            }
           }
         });
       });
@@ -108,4 +122,3 @@ const useSamplePlayers = (
 };
 
 export default useSamplePlayers;
-

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 //import debounce from "lodash.debounce";
 
-const XYPad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
+const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
   const padRef = useRef(null);
   const [position, setPosition] = useState({
     x: swingAmount,
@@ -70,4 +70,4 @@ const XYPad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
   );
 };
 
-export default XYPad;
+export default Pad;

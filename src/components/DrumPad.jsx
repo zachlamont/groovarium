@@ -8,11 +8,13 @@ const DrumPad = ({
   timingOffset,
 }) => {
   const bgColor = isActive ? "bg-yellow-500" : "bg-slate-400";
-  const borderColor = isCurrent ? "border-blue-500" : "border-transparent";
+  const borderColor = isCurrent
+    ? "border-8 border-blue-500"
+    : "border-transparent";
 
   return (
     <div
-    className={`flex-grow w-8 h-8 m-1 border-2 ${bgColor} ${borderColor} select-none`}
+      className={`flex-grow w-8 h-8 m-1 border-2 ${bgColor} ${borderColor} select-none`}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
     >

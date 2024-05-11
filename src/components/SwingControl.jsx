@@ -1,5 +1,5 @@
 import React from "react";
-import XYPad from "./XyPad"; // Import the custom XYPad component
+import Pad from "./XyPad"; // Import the custom XYPad component
 
 const SwingControl = ({
   swingAmount,
@@ -32,7 +32,7 @@ const SwingControl = ({
 
   return (
     <div className="bg-emerald-600 p-4">
-      <XYPad
+      <Pad
         width={300}
         height={300}
         onChange={handleXYChange}
