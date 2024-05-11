@@ -33,7 +33,7 @@ const Groovarium = () => {
   const [selectedPresetId, setSelectedPresetId] = useState(1);
   const [drumPattern, setDrumPattern] = useState({ ...drumPatternConstant });
   const [isTwoBars, setIsTwoBars] = useState(false);
-  const [loopLength, setLoopLength] = useState(2);
+  const [loopLength, setLoopLength] = useState(1);
   const [pushPullSnare, setPushPullSnare] = useState({
     offset: 0,
     steps: "1/8",
@@ -152,7 +152,17 @@ const Groovarium = () => {
   };
 
   const toggleTwoBars = () => {
-    setIsTwoBars(!isTwoBars);
+    if (!isTwoBars) {
+      setIsTwoBars(true);
+      setLoopLength(2);
+    } else {
+      setIsTwoBars(false);
+    }
+  };
+
+  const handleDelete = () => {
+    setIsTwoBars(false);
+    setLoopLength(1);
   };
 
   useEffect(() => {
@@ -261,7 +271,12 @@ const Groovarium = () => {
         swing8ToggledInstruments={swing8ToggledInstruments}
         setSwing8ToggledInstruments={setSwing8ToggledInstruments}
       />
-      <SelectTwoBars isTwoBars={isTwoBars} toggleTwoBars={toggleTwoBars} />
+      <SelectTwoBars
+        isTwoBars={isTwoBars}
+        toggleTwoBars={toggleTwoBars}
+        handleDelete={handleDelete}
+      />
+
       <div
         className={`drum-pads-container ${isTwoBars ? "show-second-bar" : ""}`}
       >

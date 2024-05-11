@@ -116,7 +116,7 @@ const useSamplePlayers = (
         }
       });
     };
-  }, [allLoaded, drumPattern, selectedSamples, isGhostNotes]);
+  }, [allLoaded, drumPattern, selectedSamples, isGhostNotes, loopLength]);
 
   return { players, allLoaded };
 };

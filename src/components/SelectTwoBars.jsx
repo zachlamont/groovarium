@@ -1,10 +1,11 @@
-import React from 'react';
+import React from "react";
 
-const SelectTwoBars = ({ isTwoBars, toggleTwoBars }) => {
+const SelectTwoBars = ({ isTwoBars, toggleTwoBars, handleDelete }) => {
   return (
-    <button onClick={toggleTwoBars}>
-      {isTwoBars ? 'Switch to One Bar' : 'Switch to Two Bars'}
-    </button>
+    <div>
+      <button onClick={toggleTwoBars}>{isTwoBars ? "<" : ">"}</button>
+      {isTwoBars && <button onClick={handleDelete}>Delete</button>}
+    </div>
   );
 };
 
