@@ -17,6 +17,7 @@ import SampleSelector from "./SampleSelector";
 import GenreSelector from "./GenreSelector";
 import PresetSelector from "./PresetSelector";
 import SelectTwoBars from "./SelectTwoBars";
+import MidiExport from "./MidiExport";
 
 const Groovarium = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -313,6 +314,13 @@ const Groovarium = () => {
         toggledInstruments={toggledInstruments}
         toggleInstrument={toggleInstrument}
       />
+      <MidiExport
+        drumPattern={drumPattern}
+        isGhostNotes={isGhostNotes}
+        loopLength={loopLength}
+        bpm={bpm}
+      />
+
       <div>
         <pre>
           {JSON.stringify(
