@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-//import debounce from "lodash.debounce";
 
 const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
   const padRef = useRef(null);
@@ -9,23 +8,24 @@ const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
   });
   const [dragging, setDragging] = useState(false);
 
-  useEffect(() => {
-    setPosition({ x: swingAmount, y: height - swing8Amount });
+  // Define moveHandle at a scope accessible to all event handlers that need it
+  const moveHandle = (event) => {
+    const rect = padRef.current.getBoundingClientRect();
+    let newX = event.clientX - rect.left;
+    let newY = height - (event.clientY - rect.top); // Reverse the Y-coordinate
 
+    // Constrain the handle within the pad boundaries
+    newX = Math.max(0, Math.min(newX, width));
+    newY = Math.max(0, Math.min(newY, height));
+
+    setPosition({ x: newX, y: height - newY }); // Store position with inverted Y
+    onChange({ x: newX / width, y: newY / height }); // Normalize newY before sending
+  };
+
+  useEffect(() => {
     const handleMouseMove = (event) => {
       if (dragging) {
-        requestAnimationFrame(() => {
-          const rect = padRef.current.getBoundingClientRect();
-          let newX = event.clientX - rect.left;
-          let newY = height - (event.clientY - rect.top); // Reverse the Y-coordinate
-
-          // Constrain the handle within the pad boundaries
-          newX = Math.max(0, Math.min(newX, width));
-          newY = Math.max(0, Math.min(newY, height));
-
-          setPosition({ x: newX, y: height - newY }); // Store position with inverted Y
-          onChange({ x: newX / width, y: newY / height }); // Normalize newY before sending
-        });
+        moveHandle(event);
       }
     };
 
@@ -40,11 +40,11 @@ const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [dragging, width, height, onChange, swingAmount, swing8Amount]);
+  }, [dragging, width, height, onChange]);
 
   const handleMouseDown = (event) => {
     setDragging(true);
-    handleMouseMove(event);
+    moveHandle(event); // Move handle to click location immediately
   };
 
   return (
@@ -71,3 +71,5 @@ const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
 };
 
 export default Pad;
+
+
