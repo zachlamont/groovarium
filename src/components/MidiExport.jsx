@@ -13,6 +13,7 @@ const MidiExport = ({ drumPattern, isGhostNotes, loopLength, bpm }) => {
     const midi = new Midi();
     midi.header.setTempo(bpm); // Set the tempo
     const track = midi.addTrack();
+    track.channel = 9; // Set the channel to 9 for drum kit
     const PPQ = 192; // Pulses per quarter note
 
     for (const instrument in drumPattern) {
@@ -56,6 +57,6 @@ const MidiExport = ({ drumPattern, isGhostNotes, loopLength, bpm }) => {
 };
 
 export default MidiExport;
-  
-  //In this component, we have a  handleClick  function that creates a new MIDI file using the  @tonejs/midi  library. We loop through each instrument in the  drumPattern  object and add notes to the MIDI track based on the pattern and timing offsets. We set the tempo, MIDI number, time, duration, and velocity for each note. Finally, we create a Blob object from the MIDI data, create a download link, and simulate a click event to download the file. 
-  //Now we can import the  MidiExport  component in the  App  component and pass the required props to it. 
+
+//In this component, we have a  handleClick  function that creates a new MIDI file using the  @tonejs/midi  library. We loop through each instrument in the  drumPattern  object and add notes to the MIDI track based on the pattern and timing offsets. We set the tempo, MIDI number, time, duration, and velocity for each note. Finally, we create a Blob object from the MIDI data, create a download link, and simulate a click event to download the file.
+//Now we can import the  MidiExport  component in the  App  component and pass the required props to it.
