@@ -71,5 +71,3 @@ const Pad = ({ width, height, onChange, swingAmount, swing8Amount }) => {
 };
 
 export default Pad;
-
-

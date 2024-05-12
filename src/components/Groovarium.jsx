@@ -232,6 +232,7 @@ const Groovarium = () => {
       <GenreSelector
         selectedGenre={selectedGenre}
         onGenreSelect={setSelectedGenre}
+        onPresetSelect={handlePresetSelect}
       />
       <PresetSelector
         onPresetSelect={handlePresetSelect}

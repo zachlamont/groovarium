@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
+import { presets } from "../constants/groovarium";
 
 const genres = ["Pop", "Rock", "Funk"];
 
-const GenreSelector = ({ selectedGenre, onGenreSelect }) => {
+const GenreSelector = ({ selectedGenre, onGenreSelect, onPresetSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleSelect = (genre) => {
     onGenreSelect(genre);
     setIsOpen(false);
+
+    // Call onPresetSelect with the ID of the first preset of the selected genre:
+    const firstPresetId = presets[genre][0].id;
+    onPresetSelect(firstPresetId, genre);
   };
 
   useEffect(() => {
